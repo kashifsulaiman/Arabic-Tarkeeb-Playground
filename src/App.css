@@ -1,10 +1,20 @@
-.App {
-  text-align: center;
+@font-face {
+  font-family: 'DecoType';
+  src: url(./assets/fonts/DecoTypeThuluth.ttf) format('truetype')
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+@font-face {
+  font-family: 'AlQalam';
+  src: url(./assets/fonts/AlQalamQuran.ttf) format('truetype')
+}
+
+
+* {
+  font-family: 'AlQalam' !important
+}
+
+.App {
+  text-align: center;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -14,14 +24,72 @@
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  background-color: white;
+  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   font-size: calc(10px + 2vmin);
+  color: black;
+}
+
+.App-header .inputs-container {
+  display: flex;
+  /* align-items: center; */
+  justify-content: space-around;
+  width: 100%;
+  overflow-x: scroll;
+}
+
+.App-header .inputs-container .input-elements {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: space-around */
+}
+
+.App-header .inputs-container .input-elements .input{
+  width: 100px;
+  direction: rtl
+}
+
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.fixed {
+  position: fixed;
+  top: 10px;
+  z-index: 100;
+  background-color: rgb(0, 40, 99);
+  box-shadow: 0 15px 15px 2px gray;
+  border-radius: 10px;
+  padding: 10px;
+  width: 30%;
   color: white;
+}
+
+.sub-inputs {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.outline {
+  box-shadow: 6px 10px 15px 0px gray;
+  width: 90%;
+  margin: 20px;
+  padding-bottom: 40px;
+}
+
+.row-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .App-link {

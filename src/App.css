@@ -86,6 +86,7 @@
 .outline {
   box-shadow: 6px 10px 15px 0px gray;
   width: 90%;
+  padding: 10px;
   margin: 20px;
   padding-bottom: 40px;
 }
@@ -93,6 +94,7 @@
 .row-container {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 100%;
 }
 

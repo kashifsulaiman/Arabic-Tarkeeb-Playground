@@ -1,10 +1,16 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Remove from '@mui/icons-material/Remove';
 import Add from '@mui/icons-material/Add';
 import ClearIcon from '@mui/icons-material/Clear';
 import { styled } from '@mui/system';
+import ToggleButton from '@mui/material/ToggleButton';
+import Card from '@mui/material/Card'
+import CardHeader from '@mui/material/CardHeader'
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import '../App.css';
 
 const RedCircleClearIcon = styled('div')({
@@ -31,9 +37,10 @@ const GrayCircleClearIcon = styled('div')({
   color: 'white',
 });
 
-function TarkeebRow({ editMode, inputSize, updateRows, index, row, totalRows }) {
+function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, totalRows, deleteRow }) {
   const [inputs, setInputs] = useState(row)
   const [rowsLength, setRowsLength] = useState(totalRows)
+  const [editMode, setEditMode] = useState(allEditMode)
 
   useEffect(() => {
     updateRows(inputs, index)
@@ -45,6 +52,10 @@ function TarkeebRow({ editMode, inputSize, updateRows, index, row, totalRows }) 
       setRowsLength(totalRows)
     }
   }, [totalRows])
+
+  useEffect(() => {
+    setEditMode(allEditMode)
+  }, [allEditMode])
 
   const onPaste = (e) => {
     let paste = (e.clipboardData || window.clipboardData).getData("text");
@@ -168,12 +179,34 @@ function TarkeebRow({ editMode, inputSize, updateRows, index, row, totalRows }) 
   })
 
   return (
-    <div className='inputs-container'>
-      {editMode && <Button onClick={addRowInput} component="label" variant="contained">
-        <Add />
-      </Button>}
-      {inputElements.reverse()}
-    </div>
+    <Card variant="outlined" className='outline'>
+      <CardHeader
+        action={
+          <div>
+            <ToggleButton
+              value="check"
+              selected={editMode}
+              onChange={() => {
+                setEditMode(!editMode)
+              }}
+            >
+              {/* <Edit style={{ color: 'white' }} /> */}
+              <EditIcon />
+            </ToggleButton>
+            <IconButton aria-label="settings" onClick={() => deleteRow(index)}>
+              <DeleteIcon />
+            </IconButton>
+          </div>
+        }
+        title={<u><h2>عبارت # {index + 1}</h2></u>}
+      />
+      <div className='inputs-container'>
+        {editMode && <Button onClick={addRowInput} component="label" variant="contained">
+          <Add />
+        </Button>}
+        {inputElements.reverse()}
+      </div>
+    </Card>
   );
 }
 

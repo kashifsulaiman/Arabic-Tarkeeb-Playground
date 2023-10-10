@@ -6,7 +6,6 @@ import Button from '@mui/material/Button';
 import ToggleButton from '@mui/material/ToggleButton';
 import TarkeebRow from './components/TarkeebRow';
 import Edit from '@mui/icons-material/EditSharp';
-import Remove from '@mui/icons-material/Remove';
 import Add from '@mui/icons-material/Add';
 import './App.css';
 
@@ -71,8 +70,6 @@ function App() {
 
         {rows.map((item, index) => {
           return <div class='row-container'>
-            <div class='outline'>
-              <h3><u>عبارت # {index + 1}</u></h3>
               <TarkeebRow
                 editMode={editMode}
                 inputSize={inputSize}
@@ -80,11 +77,8 @@ function App() {
                 updateRows={updateRows}
                 row={item} 
                 totalRows={rows.length}
-                />
-            </div>
-            <Button onClick={() => deleteRow(index)} component="label" variant="contained">
-              <Remove />
-            </Button>
+                deleteRow={deleteRow}
+              />
           </div>
         })}
         <Button onClick={() => addRow()} component="label" variant="contained">

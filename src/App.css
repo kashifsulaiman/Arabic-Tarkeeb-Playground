@@ -37,9 +37,13 @@
 .App-header .inputs-container {
   display: flex;
   /* align-items: center; */
-  justify-content: space-around;
+  justify-content: space-between;
   width: 100%;
   overflow-x: scroll;
+}
+
+.App-header .inputs-container::before, .App-header .inputs-container::after {
+  content: ''; /* Insert space before the first item and after the last one */
 }
 
 .App-header .inputs-container .input-elements {

@@ -58,6 +58,9 @@
   direction: rtl
 }
 
+.animate {
+  transition: width 0.3s ease; /* You can adjust the duration and timing function as needed */
+}
 
 .row {
   display: flex;

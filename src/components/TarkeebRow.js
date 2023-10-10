@@ -41,6 +41,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
   const [inputs, setInputs] = useState(row)
   const [rowsLength, setRowsLength] = useState(totalRows)
   const [editMode, setEditMode] = useState(allEditMode)
+  const [currentInput, setCurrentInput] = useState()
 
   useEffect(() => {
     updateRows(inputs, index)
@@ -152,11 +153,13 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
                 label={`خانہ # ${index + 1}.${colIndex + 1}`}
                 margin="normal"
                 color="secondary"
-                className="input"
+                className="input animate"
                 variant="outlined"
                 value={column.value}
-                style={{ width: inputSize * 4 + 'px', heigth: inputSize + 30 + 'px' }}
+                style={{ width: inputSize * (currentInput === `${index}.${colIndex}` ? 8 : 4)  + 'px', heigth: inputSize + 30 + 'px' }}
                 onChange={(e) => updateColInput(e, index, colIndex)}
+                onFocus={() => setCurrentInput(`${index}.${colIndex}`)}
+                onBlur={() => setCurrentInput()}
                 inputProps={{ style: { fontSize: inputSize - 5 } }}
                 InputLabelProps={{ style: { fontSize: inputSize - 3 } }} // font size of input label
               />

@@ -96,6 +96,11 @@
   width: 100%;
 }
 
+.input-plus-container {
+  display: flex;
+  align-items: center;
+}
+
 .App-link {
   color: #61dafb;
 }

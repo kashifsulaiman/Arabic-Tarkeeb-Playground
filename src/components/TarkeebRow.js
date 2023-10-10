@@ -19,8 +19,8 @@ const RedCircleClearIcon = styled('div')({
   color: 'white'
 });
 
-const BlueCircleClearIcon = styled('div')({
-  backgroundColor: '#1665C0',
+const GrayCircleClearIcon = styled('div')({
+  backgroundColor: 'gray',
   width: 24,
   height: 24,
   borderRadius: '50%',
@@ -95,7 +95,7 @@ function TarkeebRow({ editMode, inputSize, updateRows, index, row, totalRows }) 
 
   const addInputAfter = (index) => {
     const tempInputs = [...inputs]
-    tempInputs.splice(index + 1, 0, { columns: [], value: '' })
+    tempInputs.splice(index, 0, { columns: [], value: '' })
     setInputs(tempInputs)
   }
 
@@ -113,7 +113,7 @@ function TarkeebRow({ editMode, inputSize, updateRows, index, row, totalRows }) 
           <Button onClick={() => deleteInput(index)} component="label" variant="contained">
             <Remove />
           </Button>
-          <div>
+          <div className='input-plus-container'>
             <TextField
               onPaste={(e) => index === 0 && onPaste(e, index)}
               label={`خانہ # ${index + 1}`}
@@ -127,12 +127,12 @@ function TarkeebRow({ editMode, inputSize, updateRows, index, row, totalRows }) 
               inputProps={{ style: { fontSize: inputSize } }}
               InputLabelProps={{ style: { fontSize: inputSize - 3 } }} // font size of input label
             />
-            {index < inputs.length - 1 && <BlueCircleClearIcon
-              style={{ width: inputSize, height: inputSize, position: 'relative', top: -60, right: 10 }}
+            {index !== 0 && index < inputs.length && <GrayCircleClearIcon
+              style={{ width: inputSize, height: inputSize }}
               onClick={() => addInputAfter(index)}
             >
               <Add style={{ fontSize: inputSize }} />
-            </BlueCircleClearIcon>}
+            </GrayCircleClearIcon>}
           </div>
 
           {_.columns.map((column, colIndex) => {

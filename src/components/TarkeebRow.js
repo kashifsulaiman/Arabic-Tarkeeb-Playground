@@ -120,7 +120,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
   }
 
   const inputElements = inputs.map((_, index) => {
-    return <div class={`input-elements ${getRightBorderClass(index)} ${getLeftBorderClass(index)}`}>
+    return <div class={`input-elements ${!editMode && 'padding'} ${getRightBorderClass(index)} ${getLeftBorderClass(index)}`}>
       {!editMode ?
         <>
           <p style={{ fontSize: inputSize }}>{inputs[index].value}</p>

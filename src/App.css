@@ -68,6 +68,7 @@
 
 .animate {
   transition: width 0.3s ease; /* You can adjust the duration and timing function as needed */
+  transition: opacity 0.3s ease; /* You can adjust the duration and timing function as needed */
 }
 
 .row {
@@ -86,6 +87,12 @@
   padding: 10px;
   width: 30%;
   color: white;
+  min-width: 300px;
+  opacity: 0.05;
+}
+
+.visible {
+  opacity: 1;
 }
 
 .sub-inputs {

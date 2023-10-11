@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import TextDecrease from '@mui/icons-material/TextDecrease';
 import TextIncrease from '@mui/icons-material/TextIncrease';
 import Slider from '@mui/material/Slider';
@@ -13,6 +13,16 @@ function App() {
   const [rows, setRows] = useState([])
   const [editMode, setEditMode] = useState(true)
   const [inputSize, setInputSize] = useState(24)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    setTimeout(() => {
+      setVisible(true)
+      setTimeout(() => {
+        setVisible(false)
+      }, 3000)
+    }, 2000)
+  }, [])
 
   const deleteRow = (index) => {
     const tempRows = [...rows]
@@ -44,9 +54,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        ِ<h1>الترکیب</h1>
+       <h1>الترکیب</h1>
 
-        {<div className='row fixed'>
+        {<div className={`row fixed animate ${visible && 'visible'}`} onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)}>
           <TextDecrease />
           <Slider min={10} max={40} valueLabelDisplay="on" aria-label="Volume" value={inputSize} onChange={e => setInputSize(e.target.value)} />
           <TextIncrease />

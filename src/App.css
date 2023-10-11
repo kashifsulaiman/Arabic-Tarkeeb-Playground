@@ -68,6 +68,9 @@
 
 .animate {
   transition: width 0.3s ease; /* You can adjust the duration and timing function as needed */
+}
+
+.animate-opacity {
   transition: opacity 0.3s ease; /* You can adjust the duration and timing function as needed */
 }
 

@@ -56,7 +56,7 @@ function App() {
       <header className="App-header">
        <h1>الترکیب</h1>
 
-        {<div className={`row fixed animate ${visible && 'visible'}`} onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)}>
+        {<div className={`row fixed animate-opacity ${visible && 'visible'}`} onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)}>
           <TextDecrease />
           <Slider min={10} max={40} valueLabelDisplay="on" aria-label="Volume" value={inputSize} onChange={e => setInputSize(e.target.value)} />
           <TextIncrease />

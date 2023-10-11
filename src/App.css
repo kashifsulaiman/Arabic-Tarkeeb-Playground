@@ -50,7 +50,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* justify-content: space-around */
+  padding: 10px;
+}
+
+.left-border {
+  border-left: 1px solid #f9f9f9;
+}
+
+.right-border {
+  border-right: 1px solid #f9f9f9;
 }
 
 .App-header .inputs-container .input-elements .input{

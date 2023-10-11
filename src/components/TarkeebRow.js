@@ -111,8 +111,16 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
     setInputs(tempInputs)
   }
 
+  const getLeftBorderClass = (index) => {
+    return !editMode && index !== inputs.length - 1 && 'left-border'
+  }
+
+  const getRightBorderClass = (index) => {
+    return !editMode && index !== 0 && 'right-border'
+  }
+
   const inputElements = inputs.map((_, index) => {
-    return <div class='input-elements'>
+    return <div class={`input-elements ${getRightBorderClass(index)} ${getLeftBorderClass(index)}`}>
       {!editMode ?
         <>
           <p style={{ fontSize: inputSize }}>{inputs[index].value}</p>

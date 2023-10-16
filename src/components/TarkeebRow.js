@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Xarrow from "react-xarrows";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Remove from '@mui/icons-material/Remove';
@@ -37,14 +38,15 @@ const GrayCircleClearIcon = styled('div')({
   color: 'white',
 });
 
-function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, totalRows, deleteRow }) {
+function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIndex, row, totalRows, deleteRow }) {
   const [inputs, setInputs] = useState(row)
   const [rowsLength, setRowsLength] = useState(totalRows)
   const [editMode, setEditMode] = useState(allEditMode)
   const [currentInput, setCurrentInput] = useState()
+  const [linkStartIndex, setLinkStartIndex] = useState(null)
 
   useEffect(() => {
-    updateRows(inputs, index)
+    updateRows(inputs, rowIndex)
   }, [inputs])
 
   useEffect(() => {
@@ -77,9 +79,10 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
     setInputs(tempInputs)
   }
 
-  const updateInput = (e, index) => {
+  const updateInput = (e, index, isLink, isChild) => {
     const tempInputs = [...inputs]
-    tempInputs[index].value = e.target.value
+    const value = isLink ? isChild ? 'childLinkValue' : 'linkValue' : 'value'
+    tempInputs[index][value] = e.target.value
     setInputs(tempInputs)
   }
 
@@ -119,13 +122,86 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
     return !editMode && index !== 0 && 'right-border'
   }
 
+  const getIndexFromId = (id) => {
+    const splittedId = id.split('-')
+    return splittedId[splittedId.length - 1]
+  }
+
+  const addLink = (id, child) => {
+    const tempInputs = [...inputs]
+    const indexFromId = getIndexFromId(id)
+    const input = tempInputs[linkStartIndex ? getIndexFromId(linkStartIndex) : indexFromId]
+    if (!linkStartIndex) {
+      if (child) {
+        input.childLinkStart = id
+        input.childLinkEnd = ''
+      } else {
+        input.linkStart = id
+        input.linkEnd = ''
+      }
+      setLinkStartIndex(id)
+    } else if (linkStartIndex === id) {
+      if (child) {
+        delete input.childLinkStart
+      } else {
+        delete input.linkStart
+      }
+      setLinkStartIndex(null)
+    } else {
+      if (child) {
+        input.childLinkEnd = id
+      } else {
+        input.linkEnd = id
+      }
+      setLinkStartIndex(null)
+    }
+    setInputs(tempInputs)
+  }
+
   const inputElements = inputs.map((_, index) => {
+    const { linkStart, linkEnd, linkValue, childLinkStart, childLinkEnd, childLinkValue } = _
     return <div class={`input-elements ${!editMode && 'padding'} ${getRightBorderClass(index)} ${getLeftBorderClass(index)}`}>
       {!editMode ?
         <>
           <p style={{ fontSize: inputSize }}>{inputs[index].value}</p>
-          {_.columns.map((column) => {
-            return <p style={{ fontSize: inputSize, color: 'green' }}>{column.value}</p>
+          {_.columns.map((column, colIndex) => {
+            const lastColumn = colIndex === _.columns.length - 1
+            return <>
+              {linkStart && linkEnd && lastColumn && <Xarrow
+                start={linkStart} //can be react ref
+                end={linkEnd} //or an id
+                startAnchor={'bottom'}
+                endAnchor={'bottom'}
+                curveness={0}
+                _cpx1Offset={20}
+                _cpy2Offset={400}
+                path='straight'
+                animateDrawing={0.8}
+                showHead={false}
+                labels={
+                  <p id={`row-${rowIndex}-link-new-${index}`}
+                  style={{ position: 'relative', top: 100, border: linkValue ? '1px solid black' : '', backgroundColor: 'white', width: 200 }}>{linkValue}</p>
+                }
+              />}
+              {childLinkStart && childLinkEnd && lastColumn && <Xarrow
+                start={childLinkStart} //can be react ref
+                end={childLinkEnd} //or an id
+                curveness={0}
+                _cpx1Offset={20}
+                _cpy2Offset={400}
+                color='orange'
+                animateDrawing={0.8}
+                showHead={false}
+                labels={
+                  <p style={{ position: 'relative', top: 100, border: childLinkValue ? '1px solid black' : '', backgroundColor: 'white', width: 200 }}>{childLinkValue}</p>
+                }
+              />}
+              <p
+                id={lastColumn && `row-${rowIndex}-link-${index}`}
+                style={{ fontSize: inputSize, color: 'green' }}>
+                {column.value}
+              </p>
+            </>
           })}
         </>
         :
@@ -137,6 +213,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
             <TextField
               onPaste={(e) => index === 0 && onPaste(e, index)}
               label={`خانہ # ${index + 1}`}
+              id={index + 1}
               margin="normal"
               color="secondary"
               className="input"
@@ -159,12 +236,13 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
             return <div className='sub-inputs'>
               <TextField
                 label={`خانہ # ${index + 1}.${colIndex + 1}`}
+                id={`${index + 1}.${colIndex + 1}`}
                 margin="normal"
                 color="secondary"
                 className="input animate"
                 variant="outlined"
                 value={column.value}
-                style={{ width: inputSize * (currentInput === `${index}.${colIndex}` ? 8 : 4)  + 'px', heigth: inputSize + 30 + 'px' }}
+                style={{ width: inputSize * (currentInput === `${index}.${colIndex}` ? 8 : 4) + 'px', heigth: inputSize + 30 + 'px' }}
                 onChange={(e) => updateColInput(e, index, colIndex)}
                 onFocus={() => setCurrentInput(`${index}.${colIndex}`)}
                 onBlur={() => setCurrentInput()}
@@ -183,8 +261,85 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
           <Button className='checks' onClick={() => addColInput(index)} component="label" variant="contained">
             <Add />
           </Button>
-
-
+          {linkStart && linkEnd && <Xarrow
+            start={linkStart} //can be react ref
+            end={linkEnd} //or an id
+            path='straight'
+            animateDrawing={0.8}
+            startAnchor={'bottom'}
+            endAnchor={'bottom'}
+            curveness={0}
+            _cpy2Offset={400}
+            showHead={false}
+            path='straight'
+            labels={<>
+              <TextField
+                label={`خانہ`}
+                margin="normal"
+                color="secondary"
+                className="input animate"
+                variant="outlined"
+                value={linkValue}
+                style={{ zIndex: 100, width: inputSize * (currentInput === `row-${rowIndex}-link-${index}` ? 8 : 4) + 'px', heigth: inputSize + 30 + 'px', background: 'white' }}
+                onChange={(e) => updateInput(e, index, true)}
+                onFocus={() => setCurrentInput(`row-${rowIndex}-link-${index}`)}
+                onBlur={() => setCurrentInput()}
+                inputProps={{ style: { fontSize: inputSize - 5 } }}
+                InputLabelProps={{ style: { fontSize: inputSize - 3 } }} // font size of input label
+              />
+              <br />
+              <ToggleButton
+                id={`row-${rowIndex}-link-new-${index}`}
+                value="check"
+                selected={linkStartIndex === `row-${rowIndex}-link-new-${index}`}
+                color='warning'
+                onChange={() => addLink(`row-${rowIndex}-link-new-${index}`, true)}
+              >
+                Link
+            </ToggleButton>
+            </>
+            }
+          />}
+          {childLinkStart && childLinkEnd && <Xarrow
+            start={childLinkStart} //can be react ref
+            end={childLinkEnd} //or an id
+            path='straight'
+            animateDrawing={0.8}
+            startAnchor={'bottom'}
+            endAnchor={'bottom'}
+            curveness={0}
+            color='orange'
+            // _cpx1Offset={100}
+            _cpy2Offset={400}
+            showHead={false}
+            path='straight'
+            labels={<>
+              <TextField
+                label={`خانہ`}
+                margin="normal"
+                color="secondary"
+                className="input animate"
+                variant="outlined"
+                value={childLinkValue}
+                style={{ zIndex: 100, width: inputSize * (currentInput === `row-${rowIndex}-link-new-${index}` ? 8 : 4) + 'px', heigth: inputSize + 30 + 'px', background: 'white' }}
+                onChange={(e) => updateInput(e, index, true, true)}
+                onFocus={() => setCurrentInput(`row-${rowIndex}-link-new-${index}`)}
+                onBlur={() => setCurrentInput()}
+                inputProps={{ style: { fontSize: inputSize - 5 } }}
+                InputLabelProps={{ style: { fontSize: inputSize - 3 } }} // font size of input label
+              />
+            </>
+            }
+          />}
+          {!!_.columns.length && <ToggleButton
+            id={`row-${rowIndex}-link-${index}`}
+            value="check"
+            selected={linkStartIndex === `row-${rowIndex}-link-${index}`}
+            color='warning'
+            onChange={() => addLink(`row-${rowIndex}-link-${index}`)}
+          >
+            Link
+            </ToggleButton>}
         </>}
     </div>
   })
@@ -204,12 +359,12 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index, row, 
               {/* <Edit style={{ color: 'white' }} /> */}
               <EditIcon />
             </ToggleButton>
-            <IconButton aria-label="settings" onClick={() => deleteRow(index)}>
+            <IconButton aria-label="settings" onClick={() => deleteRow(rowIndex)}>
               <DeleteIcon />
             </IconButton>
           </div>
         }
-        title={<u><h2>عبارت # {index + 1}</h2></u>}
+        title={<u><h2>عبارت # {rowIndex + 1}</h2></u>}
       />
       <div className='inputs-container'>
         {editMode && <Button onClick={addRowInput} component="label" variant="contained">

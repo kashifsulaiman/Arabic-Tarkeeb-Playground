@@ -1,17 +1,17 @@
 {
   "files": {
-    "main.css": "/Arabic-Tarkeeb-Playground/static/css/main.975211d4.css",
-    "main.js": "/Arabic-Tarkeeb-Playground/static/js/main.e7a8bc12.js",
+    "main.css": "/Arabic-Tarkeeb-Playground/static/css/main.c8754473.css",
+    "main.js": "/Arabic-Tarkeeb-Playground/static/js/main.90085876.js",
     "static/js/787.e2a803e1.chunk.js": "/Arabic-Tarkeeb-Playground/static/js/787.e2a803e1.chunk.js",
     "static/media/AlQalamQuran.ttf": "/Arabic-Tarkeeb-Playground/static/media/AlQalamQuran.d24b8a52e07f2dc6a01d.ttf",
     "static/media/DecoTypeThuluth.ttf": "/Arabic-Tarkeeb-Playground/static/media/DecoTypeThuluth.af207df011150db802a9.ttf",
     "index.html": "/Arabic-Tarkeeb-Playground/index.html",
-    "main.975211d4.css.map": "/Arabic-Tarkeeb-Playground/static/css/main.975211d4.css.map",
-    "main.e7a8bc12.js.map": "/Arabic-Tarkeeb-Playground/static/js/main.e7a8bc12.js.map",
+    "main.c8754473.css.map": "/Arabic-Tarkeeb-Playground/static/css/main.c8754473.css.map",
+    "main.90085876.js.map": "/Arabic-Tarkeeb-Playground/static/js/main.90085876.js.map",
     "787.e2a803e1.chunk.js.map": "/Arabic-Tarkeeb-Playground/static/js/787.e2a803e1.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.975211d4.css",
-    "static/js/main.e7a8bc12.js"
+    "static/css/main.c8754473.css",
+    "static/js/main.90085876.js"
   ]
 }

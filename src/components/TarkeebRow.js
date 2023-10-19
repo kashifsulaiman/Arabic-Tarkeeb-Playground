@@ -44,9 +44,11 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
   const [editMode, setEditMode] = useState(allEditMode)
   const [currentInput, setCurrentInput] = useState()
   const [linkStartIndex, setLinkStartIndex] = useState(null)
+  const [timer, setTimer] = useState(true)
 
   useEffect(() => {
     updateRows(inputs, rowIndex)
+    addDynamicHeight()
   }, [inputs])
 
   useEffect(() => {
@@ -59,6 +61,30 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
   useEffect(() => {
     setEditMode(allEditMode)
   }, [allEditMode])
+
+  useEffect(() => {
+    if (timer) {
+      //added for child arrow generation
+      setTimeout(() => {
+        setTimer(false)
+      }, 1000)
+    }
+  }, [timer])
+
+  const addDynamicHeight = () => {
+    const container = document.getElementById(`inputs-container-${rowIndex}`);
+    if (!container) return
+    const arrows = document.querySelectorAll(`.xarrow-${rowIndex}`);
+
+    let totalHeight = 0;
+
+    arrows.forEach(arrow => {
+      const arrowRect = arrow.getBoundingClientRect();
+      totalHeight = Math.max(totalHeight, arrowRect.bottom);
+    });
+
+    container.style.height = totalHeight ? `${totalHeight}px` : 'auto'
+  }
 
   const onPaste = (e) => {
     let paste = (e.clipboardData || window.clipboardData).getData("text");
@@ -148,7 +174,8 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
       }
       setLinkStartIndex(null)
     } else {
-      if (child) {
+      const linkIndexNewExists = linkStartIndex.includes('new')
+      if ((child && linkIndexNewExists) || linkIndexNewExists) {
         input.childLinkEnd = id
       } else {
         input.linkEnd = id
@@ -173,31 +200,35 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
                 startAnchor={'bottom'}
                 endAnchor={'bottom'}
                 curveness={0}
-                _cpx1Offset={20}
-                _cpy2Offset={400}
+                _cpy1Offset={180}
+                _cpy2Offset={200}
                 path='straight'
                 animateDrawing={0.8}
                 showHead={false}
                 labels={
                   <p id={`row-${rowIndex}-link-new-${index}`}
-                  style={{ position: 'relative', top: 100, border: linkValue ? '1px solid black' : '', backgroundColor: 'white', width: 200 }}>{linkValue}</p>
+                    className={`xarrow-${rowIndex}`}
+                    style={{ position: 'relative', top: 50, border: linkValue ? '1px solid black' : '', backgroundColor: 'white', width: 200 }}>{linkValue}</p>
                 }
               />}
-              {childLinkStart && childLinkEnd && lastColumn && <Xarrow
+              {!timer && childLinkStart && childLinkEnd && lastColumn && <Xarrow
                 start={childLinkStart} //can be react ref
                 end={childLinkEnd} //or an id
                 curveness={0}
-                _cpx1Offset={20}
-                _cpy2Offset={400}
+                startAnchor={'bottom'}
+                endAnchor={'bottom'}
+                _cpy1Offset={180}
+                _cpy2Offset={200}
                 color='orange'
                 animateDrawing={0.8}
                 showHead={false}
                 labels={
-                  <p style={{ position: 'relative', top: 100, border: childLinkValue ? '1px solid black' : '', backgroundColor: 'white', width: 200 }}>{childLinkValue}</p>
+                  <p style={{ position: 'relative', top: 50, border: childLinkValue ? '1px solid black' : '', backgroundColor: 'white', width: 200 }}>{childLinkValue}</p>
                 }
               />}
               <p
                 id={lastColumn && `row-${rowIndex}-link-${index}`}
+                className={`xarrow-${rowIndex}`}
                 style={{ fontSize: inputSize, color: 'green' }}>
                 {column.value}
               </p>
@@ -239,7 +270,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
                 id={`${index + 1}.${colIndex + 1}`}
                 margin="normal"
                 color="secondary"
-                className="input animate"
+                className={`input animate xarrow-${rowIndex}`}
                 variant="outlined"
                 value={column.value}
                 style={{ width: inputSize * (currentInput === `${index}.${colIndex}` ? 8 : 4) + 'px', heigth: inputSize + 30 + 'px' }}
@@ -269,7 +300,8 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
             startAnchor={'bottom'}
             endAnchor={'bottom'}
             curveness={0}
-            _cpy2Offset={400}
+            _cpy1Offset={180}
+            _cpy2Offset={200}
             showHead={false}
             path='straight'
             labels={<>
@@ -277,7 +309,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
                 label={`خانہ`}
                 margin="normal"
                 color="secondary"
-                className="input animate"
+                className={`input animate xarrow-${rowIndex}`}
                 variant="outlined"
                 value={linkValue}
                 style={{ zIndex: 100, width: inputSize * (currentInput === `row-${rowIndex}-link-${index}` ? 8 : 4) + 'px', heigth: inputSize + 30 + 'px', background: 'white' }}
@@ -300,7 +332,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
             </>
             }
           />}
-          {childLinkStart && childLinkEnd && <Xarrow
+          {!timer && childLinkStart && childLinkEnd && <Xarrow
             start={childLinkStart} //can be react ref
             end={childLinkEnd} //or an id
             path='straight'
@@ -309,8 +341,8 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
             endAnchor={'bottom'}
             curveness={0}
             color='orange'
-            // _cpx1Offset={100}
-            _cpy2Offset={400}
+            _cpy1Offset={180}
+            _cpy2Offset={200}
             showHead={false}
             path='straight'
             labels={<>
@@ -318,7 +350,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
                 label={`خانہ`}
                 margin="normal"
                 color="secondary"
-                className="input animate"
+                className={`input animate xarrow-${rowIndex}`}
                 variant="outlined"
                 value={childLinkValue}
                 style={{ zIndex: 100, width: inputSize * (currentInput === `row-${rowIndex}-link-new-${index}` ? 8 : 4) + 'px', heigth: inputSize + 30 + 'px', background: 'white' }}
@@ -354,6 +386,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
               selected={editMode}
               onChange={() => {
                 setEditMode(!editMode)
+                setTimer(true)
               }}
             >
               {/* <Edit style={{ color: 'white' }} /> */}
@@ -366,7 +399,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
         }
         title={<u><h2>عبارت # {rowIndex + 1}</h2></u>}
       />
-      <div className='inputs-container'>
+      <div id={`inputs-container-${rowIndex}`} className='inputs-container animate-height'>
         {editMode && <Button onClick={addRowInput} component="label" variant="contained">
           <Add />
         </Button>}

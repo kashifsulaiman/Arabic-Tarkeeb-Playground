@@ -12,6 +12,7 @@ import CardHeader from '@mui/material/CardHeader'
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import CircularProgress from '@mui/material/CircularProgress';
 import '../App.css';
 
 const RedCircleClearIcon = styled('div')({
@@ -45,10 +46,13 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
   const [currentInput, setCurrentInput] = useState()
   const [linkStartIndex, setLinkStartIndex] = useState(null)
   const [timer, setTimer] = useState(true)
+  const [loading, setLoading] = useState(!!row.length)
 
   useEffect(() => {
     updateRows(inputs, rowIndex)
-    addDynamicHeight()
+    setTimeout(() => {
+      addDynamicHeight()
+    }, 1200)
   }, [inputs])
 
   useEffect(() => {
@@ -67,6 +71,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
       //added for child arrow generation
       setTimeout(() => {
         setTimer(false)
+        setLoading(false)
       }, 1000)
     }
   }, [timer])
@@ -79,11 +84,17 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
     let totalHeight = 0;
 
     arrows.forEach(arrow => {
-      const arrowRect = arrow.getBoundingClientRect();
-      totalHeight = Math.max(totalHeight, arrowRect.bottom);
+      let top
+      if (arrow.className.includes('link')) {
+        const arrowRect = arrow.getBoundingClientRect();
+        top = arrowRect.top
+      } else {
+        top = arrow.offsetTop
+      }
+      totalHeight = Math.max(totalHeight, top);
     });
 
-    container.style.height = totalHeight ? `${totalHeight}px` : 'auto'
+    container.style.height = totalHeight ? `${totalHeight + 200}px` : 'auto'
   }
 
   const onPaste = (e) => {
@@ -207,7 +218,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
                 showHead={false}
                 labels={
                   <p id={`row-${rowIndex}-link-new-${index}`}
-                    className={`xarrow-${rowIndex}`}
+                    className={`xarrow-${rowIndex} link`}
                     style={{ position: 'relative', top: 50, border: linkValue ? '1px solid black' : '', backgroundColor: 'white', width: 200 }}>{linkValue}</p>
                 }
               />}
@@ -228,7 +239,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
               />}
               <p
                 id={lastColumn && `row-${rowIndex}-link-${index}`}
-                className={`xarrow-${rowIndex}`}
+                className={`xarrow-${rowIndex} link`}
                 style={{ fontSize: inputSize, color: 'green' }}>
                 {column.value}
               </p>
@@ -309,7 +320,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
                 label={`خانہ`}
                 margin="normal"
                 color="secondary"
-                className={`input animate xarrow-${rowIndex}`}
+                className={`input animate xarrow-${rowIndex} link`}
                 variant="outlined"
                 value={linkValue}
                 style={{ zIndex: 100, width: inputSize * (currentInput === `row-${rowIndex}-link-${index}` ? 8 : 4) + 'px', heigth: inputSize + 30 + 'px', background: 'white' }}
@@ -350,7 +361,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
                 label={`خانہ`}
                 margin="normal"
                 color="secondary"
-                className={`input animate xarrow-${rowIndex}`}
+                className={`input animate xarrow-${rowIndex} link`}
                 variant="outlined"
                 value={childLinkValue}
                 style={{ zIndex: 100, width: inputSize * (currentInput === `row-${rowIndex}-link-new-${index}` ? 8 : 4) + 'px', heigth: inputSize + 30 + 'px', background: 'white' }}
@@ -399,11 +410,15 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
         }
         title={<u><h2>عبارت # {rowIndex + 1}</h2></u>}
       />
-      <div id={`inputs-container-${rowIndex}`} className='inputs-container animate-height'>
+      <div className="blur-container">
+        <div id={`inputs-container-${rowIndex}`} className='inputs-container animate-height'>
         {editMode && <Button onClick={addRowInput} component="label" variant="contained">
           <Add />
         </Button>}
-        {inputElements.reverse()}
+          {inputElements.reverse()}
+        </div>
+        {loading && <div className="blur-background"></div>}
+        {loading && <CircularProgress className="circular-progress" size={50} />}
       </div>
     </Card>
   );

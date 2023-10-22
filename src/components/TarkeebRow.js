@@ -13,6 +13,10 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import CircularProgress from '@mui/material/CircularProgress';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 import '../App.css';
 
 const RedCircleClearIcon = styled('div')({
@@ -40,6 +44,9 @@ const GrayCircleClearIcon = styled('div')({
 });
 
 function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIndex, row, totalRows, deleteRow }) {
+  const [QuranMetaData, setQuranMetaData] = useState([])
+  const [surah, setSurah] = useState()
+  const [ayah, setAyah] = useState()
   const [inputs, setInputs] = useState(row)
   const [rowsLength, setRowsLength] = useState(totalRows)
   const [editMode, setEditMode] = useState(allEditMode)
@@ -76,6 +83,29 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
     }
   }, [timer])
 
+  useEffect(() => {
+    getQuranMetaData()
+  }, [])
+
+  useEffect(() => {
+    getAyahData()
+  }, [ayah])
+  
+  
+  const getQuranMetaData = async () => {
+    const response = await fetch('http://api.alquran.cloud/v1/meta')
+    const QuranData = await response.json()
+    setQuranMetaData(QuranData.data.surahs.references)
+  }
+
+  const getAyahData = async () => {
+    const response = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-quranacademy/${surah}/${ayah}.json`)
+    const ayahData = await response.json()
+    console.log('ayahData', ayahData)
+    onPaste(false, ayahData.text)
+  }
+  // console.log('QuranMetaData -->', QuranMetaData)
+
   const addDynamicHeight = () => {
     const container = document.getElementById(`inputs-container-${rowIndex}`);
     if (!container) return
@@ -97,13 +127,13 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
     container.style.height = totalHeight ? `${totalHeight + 200}px` : 'auto'
   }
 
-  const onPaste = (e) => {
-    let paste = (e.clipboardData || window.clipboardData).getData("text");
-    paste = paste.trim().split(" ");
+  const onPaste = (e, dataFromApi) => {
+    let text = dataFromApi || (e.clipboardData || window.clipboardData).getData("text");
+    text = text.trim().split(" ");
 
     const newInputs = []
 
-    paste.map(item => {
+    text.map(item => {
       newInputs.push({ columns: [], value: item })
     })
     setInputs(newInputs)
@@ -198,7 +228,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
 
   const inputElements = inputs.map((_, index) => {
     const { linkStart, linkEnd, linkValue, childLinkStart, childLinkEnd, childLinkValue } = _
-    return <div class={`input-elements ${!editMode && 'padding'} ${getRightBorderClass(index)} ${getLeftBorderClass(index)}`}>
+    return <div className={`input-elements ${!editMode && 'padding'} ${getRightBorderClass(index)} ${getLeftBorderClass(index)}`}>
       {!editMode ?
         <>
           <p style={{ fontSize: inputSize }}>{inputs[index].value}</p>
@@ -387,11 +417,46 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
     </div>
   })
 
+  const renderSurahDropdown = () => {
+    return <FormControl sx={{ m: 1, minWidth: 80 }}>
+    <InputLabel id="demo-simple-select-label">سورة</InputLabel>
+    <Select
+      labelId="demo-simple-select-label"
+      id="demo-simple-select"
+      disabled={!editMode}
+      value={surah}
+      label="سورة"
+      onChange={e => setSurah(e.target.value)}
+    >
+      {QuranMetaData.map((surah, index) => <MenuItem value={index + 1}>{surah.name} ( {index + 1}</MenuItem>)}
+    </Select>
+  </FormControl>
+  }
+
+  const renderAyahDropdown = () => {
+    const ayahs = new Array(QuranMetaData[surah - 1].numberOfAyahs).fill('')
+    return <FormControl sx={{ m: 1, minWidth: 80 }}>
+    <InputLabel id="demo-simple-select-label">آیت</InputLabel>
+    <Select
+      labelId="demo-simple-select-label"
+      id="demo-simple-select"
+      disabled={!editMode}
+      value={ayah}
+      label="آیت"
+      onChange={e => setAyah(e.target.value)}
+    >
+      {ayahs.map((_, index) => <MenuItem value={index + 1}>{index + 1}</MenuItem>)}
+    </Select>
+  </FormControl>
+  }
+
   return (
     <Card variant="outlined" className='outline'>
       <CardHeader
         action={
-          <div>
+          <div className='row'>
+            {surah && renderAyahDropdown()}
+            {renderSurahDropdown()}
             <ToggleButton
               value="check"
               selected={editMode}
@@ -400,7 +465,6 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
                 setTimer(true)
               }}
             >
-              {/* <Edit style={{ color: 'white' }} /> */}
               <EditIcon />
             </ToggleButton>
             <IconButton aria-label="settings" onClick={() => deleteRow(rowIndex)}>

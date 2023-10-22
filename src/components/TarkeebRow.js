@@ -101,10 +101,8 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
   const getAyahData = async () => {
     const response = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-quranacademy/${surah}/${ayah}.json`)
     const ayahData = await response.json()
-    console.log('ayahData', ayahData)
     onPaste(false, ayahData.text)
   }
-  // console.log('QuranMetaData -->', QuranMetaData)
 
   const addDynamicHeight = () => {
     const container = document.getElementById(`inputs-container-${rowIndex}`);
@@ -137,7 +135,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
       newInputs.push({ columns: [], value: item })
     })
     setInputs(newInputs)
-    e.preventDefault()
+    e && e.preventDefault()
   };
 
   const deleteInput = (index) => {
@@ -228,6 +226,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
 
   const inputElements = inputs.map((_, index) => {
     const { linkStart, linkEnd, linkValue, childLinkStart, childLinkEnd, childLinkValue } = _
+    const linkEndNewExists = linkEnd?.includes('new')
     return <div className={`input-elements ${!editMode && 'padding'} ${getRightBorderClass(index)} ${getLeftBorderClass(index)}`}>
       {!editMode ?
         <>
@@ -235,7 +234,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
           {_.columns.map((column, colIndex) => {
             const lastColumn = colIndex === _.columns.length - 1
             return <>
-              {linkStart && linkEnd && lastColumn && <Xarrow
+              {(linkEndNewExists && !timer || !linkEndNewExists) && linkStart && linkEnd && lastColumn && <Xarrow
                 start={linkStart} //can be react ref
                 end={linkEnd} //or an id
                 startAnchor={'bottom'}
@@ -333,7 +332,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
           <Button className='checks' onClick={() => addColInput(index)} component="label" variant="contained">
             <Add />
           </Button>
-          {linkStart && linkEnd && <Xarrow
+          {(linkEndNewExists && !timer || !linkEndNewExists) && linkStart && linkEnd && <Xarrow
             start={linkStart} //can be react ref
             end={linkEnd} //or an id
             path='straight'

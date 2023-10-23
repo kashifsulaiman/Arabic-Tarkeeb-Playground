@@ -88,20 +88,33 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
   }, [])
 
   useEffect(() => {
-    getAyahData()
+    if (ayah) {
+      getAyahData()
+    }
   }, [ayah])
   
   
   const getQuranMetaData = async () => {
-    const response = await fetch('http://api.alquran.cloud/v1/meta')
-    const QuranData = await response.json()
-    setQuranMetaData(QuranData.data.surahs.references)
+    try {
+      const response = await fetch('https://api.alquran.cloud/v1/meta')
+      const QuranData = await response.json()
+      setQuranMetaData(QuranData.data.surahs.references)
+    } catch (e) {
+      alert(e)
+    }
   }
 
   const getAyahData = async () => {
-    const response = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-quranacademy/${surah}/${ayah}.json`)
-    const ayahData = await response.json()
-    onPaste(false, ayahData.text)
+    setLoading(true)
+    try {
+      const response = await fetch(`https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-quranacademy/${surah}/${ayah}.json`)
+      const ayahData = await response.json()
+      onPaste(false, ayahData.text)
+    } catch(e) {
+      alert(e)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const addDynamicHeight = () => {
@@ -455,7 +468,7 @@ function TarkeebRow({ editMode: allEditMode, inputSize, updateRows, index: rowIn
         action={
           <div className='row'>
             {surah && renderAyahDropdown()}
-            {renderSurahDropdown()}
+            {QuranMetaData && renderSurahDropdown()}
             <ToggleButton
               value="check"
               selected={editMode}
